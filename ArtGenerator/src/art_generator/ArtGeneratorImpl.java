@@ -11,6 +11,8 @@ import javax.imageio.ImageIO;
 
 public class ArtGeneratorImpl {
 	BufferedImage img = null;
+	int imageDisplayHeight;
+	int imageDisplayWidth;
 	
 	public ArtGeneratorImpl(int x, int y) {
 		this.newImage(x, y);
@@ -108,6 +110,24 @@ public class ArtGeneratorImpl {
 		graphics.dispose();
 	}
 	
+	public void test() {
+		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints(6);
+		Graphics2D graphics = img.createGraphics();
+		for(int a = 0; a < originPoints.size(); a++) {
+			OriginPointImpl currentPoint = originPoints.get(a);
+			currentPoint.setColorR((int) (Math.random()*256));
+			currentPoint.setColorG((int) (Math.random()*256));
+			currentPoint.setColorB((int) (Math.random()*256));
+			currentPoint.setColorAlpha((currentPoint.getStrength() + 1) * 51);
+			
+			//origin pixel
+			if (!(currentPoint.getX() < 0 || currentPoint.getX() >= img.getWidth() || currentPoint.getY() < 0 || currentPoint.getY() >= img.getHeight())) {
+				graphics.setColor(new Color(currentPoint.getColorR(), currentPoint.getColorG(), currentPoint.getColorB(), (int) (currentPoint.getColorAlpha())));
+				graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
+			}
+		}
+	}
+	
 	// helper methods
 	
 	private ArrayList<OriginPointImpl> selectOriginPoints(int numOfOriginPoints) {
@@ -120,7 +140,7 @@ public class ArtGeneratorImpl {
 		boolean onSector1 = ((int) (Math.random()*2)) == 0;
 		int currentSide;
 		/* sector 1
-		 * 0: bottom right corner
+		 * 0: bottom right
 		 * 1: right
 		 * 2: top right
 		 * 3: top
@@ -147,19 +167,19 @@ public class ArtGeneratorImpl {
 				currentSide = (int) (Math.random() * sector1.size());
 				if (sector1.get(currentSide) == 0) {
 					// bottom right
-					originPoints.add(new OriginPointImpl(img.getWidth(), 
-							img.getHeight(), (int) (Math.random() * 5)));
+					originPoints.add(new OriginPointImpl(img.getWidth() - 1, 
+							img.getHeight() - 1, (int) (Math.random() * 5)));
 				} else if(sector1.get(currentSide) == 1) {
 					// right
-					originPoints.add(new OriginPointImpl(img.getWidth(),
-							(int) ((Math.random()*(img.getHeight()*.51)) + img.getHeight()*.25), (int) (Math.random() * 5)));
+					originPoints.add(new OriginPointImpl(img.getWidth() - 1,
+							(int) ((Math.random()*(img.getHeight()*.40)) + img.getHeight()*.30), (int) (Math.random() * 5)));
 				} else if(sector1.get(currentSide) == 2) {
 					// top right
-					originPoints.add(new OriginPointImpl(img.getWidth(),
+					originPoints.add(new OriginPointImpl(img.getWidth() - 1,
 							0, (int) (Math.random() * 5)));
 				} else {
 					// top
-					originPoints.add(new OriginPointImpl((int) ((Math.random()*(img.getWidth()*.51)) + img.getWidth()*.25),
+					originPoints.add(new OriginPointImpl((int) ((Math.random()*(img.getWidth()*.40)) + img.getWidth()*.30),
 							0, (int) (Math.random() * 5)));
 				}
 				sector1.remove(currentSide);
@@ -173,15 +193,15 @@ public class ArtGeneratorImpl {
 				} else if(sector2.get(currentSide) == 5) {
 					// left
 					originPoints.add(new OriginPointImpl(0,
-							(int) ((Math.random()*(img.getHeight()*.51)) + img.getHeight()*.25), (int) (Math.random() * 5)));
+							(int) ((Math.random()*(img.getHeight()*.40)) + img.getHeight()*.30), (int) (Math.random() * 5)));
 				} else if(sector2.get(currentSide) == 6) {
 					// bottom left
 					originPoints.add(new OriginPointImpl(0,
-							img.getHeight(), (int) (Math.random() * 5)));
+							img.getHeight() - 1, (int) (Math.random() * 5)));
 				} else {
 					// bottom
-					originPoints.add(new OriginPointImpl((int) ((Math.random()*(img.getWidth()*.51)) + img.getWidth()*.25),
-							img.getHeight(), (int) (Math.random() * 5)));
+					originPoints.add(new OriginPointImpl((int) ((Math.random()*(img.getWidth()*.40)) + img.getWidth()*.30),
+							img.getHeight() - 1, (int) (Math.random() * 5)));
 				}
 				sector2.remove(currentSide);
 				onSector1 = true;
@@ -607,6 +627,10 @@ public class ArtGeneratorImpl {
 		 */
 		this.clear();
 		Graphics2D graphics  = img.createGraphics();
+		Color oldColor;
+		int oldColorR;
+		int oldColorG;
+		int oldColorB;
 		
 		int biggerSide;
 		if (img.getHeight() > img.getWidth()) {
@@ -624,20 +648,22 @@ public class ArtGeneratorImpl {
 			currentPoint.setColorAlpha((currentPoint.getStrength() + 1) * 51);
 			
 			//origin pixel
-			if (!(currentPoint.getX() < 0 || currentPoint.getX() >= img.getWidth() || currentPoint.getY() < 0 || currentPoint.getY() >= img.getHeight())) {
-				graphics.setColor(new Color(currentPoint.getColorR(), currentPoint.getColorG(), currentPoint.getColorB(), (int) (currentPoint.getColorAlpha())));
-				graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
-			}
+			oldColor = new Color(img.getRGB(currentPoint.getX(), currentPoint.getY()));
+			oldColorR = oldColor.getRed();
+			oldColorG = oldColor.getGreen();
+			oldColorB = oldColor.getBlue();
+			graphics.setColor(new Color((int) ((currentPoint.getColorR() + oldColorR)/2), 
+					(int) ((currentPoint.getColorG() + oldColorG)/2),
+					(int) ((currentPoint.getColorB() + oldColorB)/2), (int) currentPoint.getColorAlpha()));
+			graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
 			
-			Color oldColor;
-			int oldColorR;
-			int oldColorG;
-			int oldColorB;
+			// gradient
 			int newColorAlpha;
 			for (int currentX = 0; currentX < img.getWidth(); currentX++) {
 				for(int currentY = 0; currentY < img.getHeight(); currentY++) {
-					newColorAlpha = (int) (255 - ((255/(biggerSide)) * Math.sqrt((Math.pow(currentX-currentPoint.getX(), 2) + Math.pow(currentY-currentPoint.getY(), 2)))));
-					if(!(newColorAlpha < 0)) {
+					newColorAlpha = (int) (currentPoint.getColorAlpha() - ((currentPoint.getColorAlpha()/(biggerSide)) *
+							Math.sqrt((Math.pow(currentX-currentPoint.getX(), 2) + Math.pow(currentY-currentPoint.getY(), 2)))));
+					if(!(newColorAlpha < 0 || (currentPoint.getX() == currentX && currentPoint.getY() == currentY))) {
 						oldColor = new Color(img.getRGB(currentX, currentY));
 						oldColorR = oldColor.getRed();
 						oldColorG = oldColor.getGreen();
