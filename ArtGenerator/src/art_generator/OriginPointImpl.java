@@ -1,6 +1,6 @@
 package art_generator;
 
-public class OriginPointImpl implements OriginPoint {
+public class OriginPointImpl {
 	private int x;
 	private int y;
 	private int strength;
@@ -16,17 +16,14 @@ public class OriginPointImpl implements OriginPoint {
 		this.strength = strength;
 	}
 
-	@Override
 	public int getX() {
 		return x;
 	}
 
-	@Override
 	public int getY() {
 		return y;
 	}
 
-	@Override
 	public int getStrength() {
 		return strength;
 	}
@@ -67,7 +64,6 @@ public class OriginPointImpl implements OriginPoint {
 		return alphaFade;
 	}
 
-	@Override
 	public void setAlphaFade(double alphaFade) {
 		this.alphaFade = alphaFade;
 		
