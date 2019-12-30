@@ -11,12 +11,10 @@ import javax.imageio.ImageIO;
 
 public class ArtGeneratorImpl {
 	BufferedImage img = null;
-	int imageDisplayHeight;
-	int imageDisplayWidth;
 	
 	public ArtGeneratorImpl(int x, int y) {
 		this.newImage(x, y);
-		this.clear();
+		this.lightClear();
 	}
 	
 	public void newImage(int x, int y) {
@@ -25,7 +23,7 @@ public class ArtGeneratorImpl {
 		 * effect: new blank image
 		 */
 		img = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
-		this.clear();
+		this.lightClear();
 	}
 
 	public void drawBoxArt() {
@@ -64,7 +62,7 @@ public class ArtGeneratorImpl {
 		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
 		
 		// draw circles
-		this.clear();
+		this.lightClear();
 		Graphics2D graphics  = img.createGraphics();
 		for(int i = 0; i < originPoints.size(); i++) {
 			OriginPointImpl currentPoint = originPoints.get(i);
@@ -80,16 +78,31 @@ public class ArtGeneratorImpl {
 		graphics.dispose();
 	}
 	
-	public void drawGradient() {
+	public void drawLightGradient() {
 		/* in: n/a
 		 * return: n/a
-		 * effect: draw random gradient on image
+		 * effect: draw random light gradient on image
 		 */
 		
 		// select origin points
 		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
 		
 		// draw gradient boxes
+		this.lightClear();
+		this.drawGradientCircles(originPoints);
+	}
+	
+	public void drawDarkGradient() {
+		/* in: n/a
+		 * return: n/a
+		 * effect: draw random dark gradient on image
+		 */
+		
+		// select origin points
+		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
+		
+		// draw gradient boxes
+		this.darkClear();
 		this.drawGradientCircles(originPoints);
 	}
 
@@ -103,9 +116,16 @@ public class ArtGeneratorImpl {
 		}
 	}
 	
-	public void clear() {
+	public void lightClear() {
 		Graphics2D graphics  = img.createGraphics();
 		graphics.setColor(Color.white);
+		graphics.fillRect(0, 0, img.getWidth(), img.getHeight());
+		graphics.dispose();
+	}
+	
+	public void darkClear() {
+		Graphics2D graphics  = img.createGraphics();
+		graphics.setColor(new Color(127, 127, 127, 0));
 		graphics.fillRect(0, 0, img.getWidth(), img.getHeight());
 		graphics.dispose();
 	}
@@ -224,7 +244,7 @@ public class ArtGeneratorImpl {
 		 * out: n/a
 		 * effect: draw boxes
 		 */
-		this.clear();
+		
 		Graphics2D graphics  = img.createGraphics();
 		
 		int biggerSide;
@@ -471,7 +491,7 @@ public class ArtGeneratorImpl {
 		 * out: n/a
 		 * effect: draw gradient boxes
 		 */
-		this.clear();
+		
 		Graphics2D graphics  = img.createGraphics();
 		
 		int biggerSide;
@@ -625,7 +645,7 @@ public class ArtGeneratorImpl {
 		 * out: n/a
 		 * effect: draw gradient circles
 		 */
-		this.clear();
+		
 		Graphics2D graphics  = img.createGraphics();
 		Color oldColor;
 		int oldColorR;
