@@ -14,7 +14,6 @@ public class ArtGeneratorImpl {
 	
 	public ArtGeneratorImpl(int x, int y) {
 		this.newImage(x, y);
-		this.lightClear();
 	}
 	
 	public void newImage(int x, int y) {
@@ -23,7 +22,6 @@ public class ArtGeneratorImpl {
 		 * effect: new blank image
 		 */
 		img = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
-		this.lightClear();
 	}
 
 	public void drawBoxArt() {
@@ -36,6 +34,7 @@ public class ArtGeneratorImpl {
 		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
 		
 		// draw gradient boxes
+		this.lightClear();
 		this.drawBoxes(originPoints);
 	}
 	
@@ -49,6 +48,7 @@ public class ArtGeneratorImpl {
 		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
 		
 		// draw gradient boxes
+		this.lightClear();
 		this.drawGradientBoxes(originPoints);
 	}
 
@@ -78,24 +78,10 @@ public class ArtGeneratorImpl {
 		graphics.dispose();
 	}
 	
-	public void drawLightGradient() {
-		/* in: n/a
-		 * return: n/a
-		 * effect: draw random light gradient on image
-		 */
-		
-		// select origin points
-		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
-		
-		// draw gradient boxes
-		this.lightClear();
-		this.drawGradientCircles(originPoints);
-	}
-	
 	public void drawDarkGradient() {
 		/* in: n/a
 		 * return: n/a
-		 * effect: draw random dark gradient on image
+		 * effect: draw random gradient on image
 		 */
 		
 		// select origin points
@@ -103,6 +89,20 @@ public class ArtGeneratorImpl {
 		
 		// draw gradient boxes
 		this.darkClear();
+		this.drawGradientCircles(originPoints);
+	}
+	
+	public void drawLightGradient() {
+		/* in: n/a
+		 * return: n/a
+		 * effect: draw random gradient on image
+		 */
+		
+		// select origin points
+		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
+		
+		// draw gradient boxes
+		this.lightClear();
 		this.drawGradientCircles(originPoints);
 	}
 
@@ -116,16 +116,18 @@ public class ArtGeneratorImpl {
 		}
 	}
 	
-	public void lightClear() {
+	public void darkClear() {
+		this.newImage(img.getWidth(), img.getHeight());
 		Graphics2D graphics  = img.createGraphics();
-		graphics.setColor(Color.white);
+		graphics.setColor(new Color(127, 127, 127, 0));
 		graphics.fillRect(0, 0, img.getWidth(), img.getHeight());
 		graphics.dispose();
 	}
 	
-	public void darkClear() {
+	public void lightClear() {
+		this.newImage(img.getWidth(), img.getHeight());
 		Graphics2D graphics  = img.createGraphics();
-		graphics.setColor(new Color(127, 127, 127, 0));
+		graphics.setColor(Color.white);
 		graphics.fillRect(0, 0, img.getWidth(), img.getHeight());
 		graphics.dispose();
 	}
@@ -229,6 +231,7 @@ public class ArtGeneratorImpl {
 		}
 		
 		// print origin points
+		System.out.println("\n");
 		for(int i = 0; i < numOfOriginPoints; i++) {
 			OriginPointImpl currentPoint = originPoints.get(i);
 			System.out.println("Point" + i + ": (x, y): (" + currentPoint.getX() + ", " + 
@@ -244,7 +247,6 @@ public class ArtGeneratorImpl {
 		 * out: n/a
 		 * effect: draw boxes
 		 */
-		
 		Graphics2D graphics  = img.createGraphics();
 		
 		int biggerSide;
@@ -491,7 +493,6 @@ public class ArtGeneratorImpl {
 		 * out: n/a
 		 * effect: draw gradient boxes
 		 */
-		
 		Graphics2D graphics  = img.createGraphics();
 		
 		int biggerSide;
@@ -645,7 +646,6 @@ public class ArtGeneratorImpl {
 		 * out: n/a
 		 * effect: draw gradient circles
 		 */
-		
 		Graphics2D graphics  = img.createGraphics();
 		Color oldColor;
 		int oldColorR;
