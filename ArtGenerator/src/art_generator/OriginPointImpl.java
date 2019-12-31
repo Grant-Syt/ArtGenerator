@@ -15,6 +15,15 @@ public class OriginPointImpl {
 		this.y = y;
 		this.strength = strength;
 	}
+	
+	public OriginPointImpl(int x, int y, int r, int g, int b, int alpha) {
+		this.x = x;
+		this.y = y;
+		this.colorR = r;
+		this.colorG = g;
+		this.colorB = b;
+		this.colorAlpha = alpha;
+	}
 
 	public int getX() {
 		return x;

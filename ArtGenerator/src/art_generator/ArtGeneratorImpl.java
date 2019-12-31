@@ -31,25 +31,11 @@ public class ArtGeneratorImpl {
 		 */
 		
 		// select origin points
-		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
+		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 2) + 4);
 		
 		// draw gradient boxes
 		this.lightClear();
 		this.drawBoxes(originPoints);
-	}
-	
-	public void drawGradientBoxArt() {
-		/* in: n/a
-		 * return: n/a
-		 * effect: draw box art on image
-		 */
-		
-		// select origin points
-		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
-		
-		// draw gradient boxes
-		this.lightClear();
-		this.drawGradientBoxes(originPoints);
 	}
 
 	public void drawCircleArt() {
@@ -63,19 +49,7 @@ public class ArtGeneratorImpl {
 		
 		// draw circles
 		this.lightClear();
-		Graphics2D graphics  = img.createGraphics();
-		for(int i = 0; i < originPoints.size(); i++) {
-			OriginPointImpl currentPoint = originPoints.get(i);
-			graphics.setColor(new Color((int) (Math.random()*256), (int) (Math.random()*256), (int) (Math.random()*256), (currentPoint.getStrength() + 1) * 51));
-			int circleDiameter;
-			if (img.getHeight() > img.getWidth()) {
-				circleDiameter = (int) img.getHeight()*2;
-			} else {
-				circleDiameter = (int) img.getWidth()*2;
-			}
-			graphics.fillOval(currentPoint.getX() - (circleDiameter/2), currentPoint.getY() - (circleDiameter/2), circleDiameter, circleDiameter);
-		}
-		graphics.dispose();
+		drawCircles(originPoints);
 	}
 	
 	public void drawDarkGradient() {
@@ -89,7 +63,7 @@ public class ArtGeneratorImpl {
 		
 		// draw gradient boxes
 		this.darkClear();
-		this.drawGradientCircles(originPoints);
+		this.drawGradient(originPoints);
 	}
 	
 	public void drawLightGradient() {
@@ -103,7 +77,32 @@ public class ArtGeneratorImpl {
 		
 		// draw gradient boxes
 		this.lightClear();
-		this.drawGradientCircles(originPoints);
+		this.drawGradient(originPoints);
+	}
+	
+	public void darkClear() {
+		this.pickColorClear(Color.black);
+	}
+	
+	public void lightClear() {
+		this.pickColorClear(Color.white);
+	}
+	
+	public void pickColorClear(Color color) {
+		Graphics2D graphics  = img.createGraphics();
+		graphics.setBackground(color);
+		graphics.clearRect(0, 0, img.getWidth(), img.getHeight());
+		graphics.dispose();
+	}
+	
+	public void clear() {
+		Graphics2D graphics  = img.createGraphics();
+		graphics.clearRect(0, 0, img.getWidth(), img.getHeight());
+		graphics.dispose();
+	}
+	
+	public OriginPointImpl newOriginPoint(int x, int y, int r, int g, int b, int alpha) {
+		return new OriginPointImpl(x, y, r, g, b, alpha);
 	}
 
 	public boolean saveCurrentImage(String fileName) {
@@ -116,133 +115,37 @@ public class ArtGeneratorImpl {
 		}
 	}
 	
-	public void darkClear() {
-		this.newImage(img.getWidth(), img.getHeight());
-		Graphics2D graphics  = img.createGraphics();
-		graphics.setColor(new Color(127, 127, 127, 0));
-		graphics.fillRect(0, 0, img.getWidth(), img.getHeight());
-		graphics.dispose();
-	}
-	
-	public void lightClear() {
-		this.newImage(img.getWidth(), img.getHeight());
-		Graphics2D graphics  = img.createGraphics();
-		graphics.setColor(Color.white);
-		graphics.fillRect(0, 0, img.getWidth(), img.getHeight());
-		graphics.dispose();
-	}
-	
-	public void test() {
-		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints(6);
+	public void originPointTest() {
+		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
+		this.lightClear();
 		Graphics2D graphics = img.createGraphics();
 		for(int a = 0; a < originPoints.size(); a++) {
 			OriginPointImpl currentPoint = originPoints.get(a);
-			currentPoint.setColorR((int) (Math.random()*256));
-			currentPoint.setColorG((int) (Math.random()*256));
-			currentPoint.setColorB((int) (Math.random()*256));
-			currentPoint.setColorAlpha((currentPoint.getStrength() + 1) * 51);
 			
 			//origin pixel
-			if (!(currentPoint.getX() < 0 || currentPoint.getX() >= img.getWidth() || currentPoint.getY() < 0 || currentPoint.getY() >= img.getHeight())) {
-				graphics.setColor(new Color(currentPoint.getColorR(), currentPoint.getColorG(), currentPoint.getColorB(), (int) (currentPoint.getColorAlpha())));
-				graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
-			}
+			graphics.setColor(new Color(currentPoint.getColorR(), currentPoint.getColorG(), currentPoint.getColorB(), (int) (currentPoint.getColorAlpha())));
+			graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
 		}
+		graphics.dispose();
 	}
 	
-	// helper methods
-	
-	private ArrayList<OriginPointImpl> selectOriginPoints(int numOfOriginPoints) {
-		/* in: number of origin points to make
-		 * out: list of origin points
-		 * effect: make list of origin points
-		 */
-		
-		ArrayList<OriginPointImpl> originPoints = new ArrayList<OriginPointImpl>();
-		boolean onSector1 = ((int) (Math.random()*2)) == 0;
-		int currentSide;
-		/* sector 1
-		 * 0: bottom right
-		 * 1: right
-		 * 2: top right
-		 * 3: top
-		 * sector 2
-		 * 4: top left
-		 * 5: left
-		 * 6: bottom left
-		 * 7: bottom
-		 */
-		ArrayList<Integer> sector1 = new ArrayList<Integer>();
-		sector1.add(0);
-		sector1.add(1);
-		sector1.add(2);
-		sector1.add(3);
-		ArrayList<Integer> sector2 = new ArrayList<Integer>();
-		sector2.add(4);
-		sector2.add(5);
-		sector2.add(6);
-		sector2.add(7);
-		
-		// Select semi-random points on border
-		for (int i = 0; i < numOfOriginPoints; i++) {
-			if(onSector1) {
-				currentSide = (int) (Math.random() * sector1.size());
-				if (sector1.get(currentSide) == 0) {
-					// bottom right
-					originPoints.add(new OriginPointImpl(img.getWidth() - 1, 
-							img.getHeight() - 1, (int) (Math.random() * 5)));
-				} else if(sector1.get(currentSide) == 1) {
-					// right
-					originPoints.add(new OriginPointImpl(img.getWidth() - 1,
-							(int) ((Math.random()*(img.getHeight()*.40)) + img.getHeight()*.30), (int) (Math.random() * 5)));
-				} else if(sector1.get(currentSide) == 2) {
-					// top right
-					originPoints.add(new OriginPointImpl(img.getWidth() - 1,
-							0, (int) (Math.random() * 5)));
-				} else {
-					// top
-					originPoints.add(new OriginPointImpl((int) ((Math.random()*(img.getWidth()*.40)) + img.getWidth()*.30),
-							0, (int) (Math.random() * 5)));
-				}
-				sector1.remove(currentSide);
-				onSector1 = false;
-			} else {
-				currentSide = (int) (Math.random() * sector2.size());
-				if (sector2.get(currentSide) == 4) {
-					// top left
-					originPoints.add(new OriginPointImpl(0, 
-							0, (int) (Math.random() * 5)));
-				} else if(sector2.get(currentSide) == 5) {
-					// left
-					originPoints.add(new OriginPointImpl(0,
-							(int) ((Math.random()*(img.getHeight()*.40)) + img.getHeight()*.30), (int) (Math.random() * 5)));
-				} else if(sector2.get(currentSide) == 6) {
-					// bottom left
-					originPoints.add(new OriginPointImpl(0,
-							img.getHeight() - 1, (int) (Math.random() * 5)));
-				} else {
-					// bottom
-					originPoints.add(new OriginPointImpl((int) ((Math.random()*(img.getWidth()*.40)) + img.getWidth()*.30),
-							img.getHeight() - 1, (int) (Math.random() * 5)));
-				}
-				sector2.remove(currentSide);
-				onSector1 = true;
-			}
-		}
-		
-		// print origin points
-		System.out.println("\n");
-		for(int i = 0; i < numOfOriginPoints; i++) {
+	public void drawCircles(ArrayList<OriginPointImpl> originPoints) {
+		Graphics2D graphics  = img.createGraphics();
+		for(int i = 0; i < originPoints.size(); i++) {
 			OriginPointImpl currentPoint = originPoints.get(i);
-			System.out.println("Point" + i + ": (x, y): (" + currentPoint.getX() + ", " + 
-			currentPoint.getY() + ") strength: " + currentPoint.getStrength());
+			graphics.setColor(new Color(currentPoint.getColorR(), currentPoint.getColorG(), currentPoint.getColorB(), (int) currentPoint.getColorAlpha()));
+			int circleDiameter;
+			if (img.getHeight() > img.getWidth()) {
+				circleDiameter = (int) img.getHeight()*2;
+			} else {
+				circleDiameter = (int) img.getWidth()*2;
+			}
+			graphics.fillOval(currentPoint.getX() - (circleDiameter/2), currentPoint.getY() - (circleDiameter/2), circleDiameter, circleDiameter);
 		}
-		System.out.print("\n");
-		
-		return originPoints;
+		graphics.dispose();
 	}
 	
-	private void drawBoxes(ArrayList<OriginPointImpl> originPoints) {
+	public void drawBoxes(ArrayList<OriginPointImpl> originPoints) {
 		/* in: list of origin points
 		 * out: n/a
 		 * effect: draw boxes
@@ -259,16 +162,10 @@ public class ArtGeneratorImpl {
 		// origin points
 		for(int a = 0; a < originPoints.size(); a++) {
 			OriginPointImpl currentPoint = originPoints.get(a);
-			currentPoint.setColorR((int) (Math.random()*256));
-			currentPoint.setColorG((int) (Math.random()*256));
-			currentPoint.setColorB((int) (Math.random()*256));
-			currentPoint.setColorAlpha((currentPoint.getStrength() + 1) * 51);
 			
 			//origin pixel
-			if (!(currentPoint.getX() < 0 || currentPoint.getX() >= img.getWidth() || currentPoint.getY() < 0 || currentPoint.getY() >= img.getHeight())) {
-				graphics.setColor(new Color(currentPoint.getColorR(), currentPoint.getColorG(), currentPoint.getColorB(), (int) (currentPoint.getColorAlpha())));
-				graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
-			}
+			graphics.setColor(new Color(currentPoint.getColorR(), currentPoint.getColorG(), currentPoint.getColorB(), (int) (currentPoint.getColorAlpha())));
+			graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
 			currentPoint.setColorAlpha(currentPoint.getColorAlpha() - (255/(biggerSide + 2)));
 		}
 		
@@ -488,160 +385,7 @@ public class ArtGeneratorImpl {
 		graphics.dispose();
 	}
 	
-	private void drawGradientBoxes(ArrayList<OriginPointImpl> originPoints) {
-		/* in: list of origin points
-		 * out: n/a
-		 * effect: draw gradient boxes
-		 */
-		Graphics2D graphics  = img.createGraphics();
-		
-		int biggerSide;
-		if (img.getHeight() > img.getWidth()) {
-			biggerSide = img.getHeight();
-		} else {
-			biggerSide = img.getWidth();
-		}
-		
-		// origin points
-		for(int a = 0; a < originPoints.size(); a++) {
-			OriginPointImpl currentPoint = originPoints.get(a);
-			currentPoint.setColorR((int) (Math.random()*256));
-			currentPoint.setColorG((int) (Math.random()*256));
-			currentPoint.setColorB((int) (Math.random()*256));
-			currentPoint.setColorAlpha((currentPoint.getStrength() + 1) * 51);
-			
-			//origin pixel
-			if (!(currentPoint.getX() < 0 || currentPoint.getX() >= img.getWidth() || currentPoint.getY() < 0 || currentPoint.getY() >= img.getHeight())) {
-				graphics.setColor(new Color(currentPoint.getColorR(), currentPoint.getColorG(), currentPoint.getColorB(), (int) (currentPoint.getColorAlpha())));
-				graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
-			}
-			currentPoint.setColorAlpha(currentPoint.getColorAlpha() - (255/(biggerSide)));
-		}
-		
-		Color oldColor;
-		int oldColorR;
-		int oldColorG;
-		int oldColorB;
-		int rowLength = 3;
-		int layerCount = 1;
-		int currentX = (int) (img.getWidth()/2);
-		int currentY = (int) (img.getHeight()/2);
-		boolean imageHasWhite = true;
-		int hasWhiteCount;
-		
-		// add layers
-		while(imageHasWhite == true) { 
-			hasWhiteCount = (rowLength-1) * 4 * originPoints.size();
-			for(int a = 0; a < originPoints.size(); a++) { // add one layer to each gradient box
-				OriginPointImpl currentPoint = originPoints.get(a);
-				
-				// top
-				currentX = currentPoint.getX() - layerCount;
-				currentY = currentPoint.getY() - layerCount;
-				for(int b = 0; b < rowLength-1; b++) {
-					if (!(currentX < 0 || currentX >= img.getWidth() || currentY < 0 || currentY >= img.getHeight())) {
-						oldColor = new Color(img.getRGB(currentX, currentY));
-						oldColorR = oldColor.getRed();
-						oldColorG = oldColor.getGreen();
-						oldColorB = oldColor.getBlue();
-						if (!(oldColorR == 255 && oldColorG == 255 && oldColorB == 255)) {
-							hasWhiteCount--;
-						}
-						graphics.setColor(new Color((int) ((currentPoint.getColorR() + oldColorR)/2), 
-								(int) ((currentPoint.getColorG() + oldColorG)/2),
-								(int) ((currentPoint.getColorB() + oldColorB)/2), (int) 
-								currentPoint.getColorAlpha()));
-						graphics.drawLine(currentX, currentY, currentX, currentY);
-					} else {
-						hasWhiteCount--;
-					}
-					currentX++;
-				}
-
-				// right
-				currentX = currentPoint.getX() + layerCount;
-				currentY = currentPoint.getY() - layerCount;
-				for(int b = 0; b < rowLength-1; b++) {
-					if (!(currentX < 0 || currentX >= img.getWidth() || currentY < 0 || currentY >= img.getHeight())) {
-						oldColor = new Color(img.getRGB(currentX, currentY));
-						oldColorR = oldColor.getRed();
-						oldColorG = oldColor.getGreen();
-						oldColorB = oldColor.getBlue();
-						if (!(oldColorR == 255 && oldColorG == 255 && oldColorB == 255)) {
-							hasWhiteCount--;
-						}
-						graphics.setColor(new Color((int) ((currentPoint.getColorR() + oldColorR)/2), 
-								(int) ((currentPoint.getColorG() + oldColorG)/2),
-								(int) ((currentPoint.getColorB() + oldColorB)/2), (int) 
-								currentPoint.getColorAlpha()));
-						graphics.drawLine(currentX, currentY, currentX, currentY);
-					} else {
-						hasWhiteCount--;
-					}
-					currentY++;
-				}
-
-				//bottom
-				currentX = currentPoint.getX() + layerCount;
-				currentY = currentPoint.getY() + layerCount;
-				for(int b = 0; b < rowLength-1; b++) {
-					if (!(currentX < 0 || currentX >= img.getWidth() || currentY < 0 || currentY >= img.getHeight())) {
-						oldColor = new Color(img.getRGB(currentX, currentY));
-						oldColorR = oldColor.getRed();
-						oldColorG = oldColor.getGreen();
-						oldColorB = oldColor.getBlue();
-						if (!(oldColorR == 255 && oldColorG == 255 && oldColorB == 255)) {
-							hasWhiteCount--;
-						}
-						graphics.setColor(new Color((int) ((currentPoint.getColorR() + oldColorR)/2), 
-								(int) ((currentPoint.getColorG() + oldColorG)/2),
-								(int) ((currentPoint.getColorB() + oldColorB)/2), (int) 
-								currentPoint.getColorAlpha()));
-						graphics.drawLine(currentX, currentY, currentX, currentY);
-					} else {
-						hasWhiteCount--;
-					}
-					currentX--;
-				}
-
-				// left
-				currentX = currentPoint.getX() - layerCount;
-				currentY = currentPoint.getY() + layerCount;
-				for(int b = 0; b < rowLength-1; b++) {
-					if (!(currentX < 0 || currentX >= img.getWidth() || currentY < 0 || currentY >= img.getHeight())) {
-						oldColor = new Color(img.getRGB(currentX, currentY));
-						oldColorR = oldColor.getRed();
-						oldColorG = oldColor.getGreen();
-						oldColorB = oldColor.getBlue();
-						if (!(oldColorR == 255 && oldColorG == 255 && oldColorB == 255)) {
-							hasWhiteCount--;
-						}
-						graphics.setColor(new Color((int) ((currentPoint.getColorR() + oldColorR)/2), 
-								(int) ((currentPoint.getColorG() + oldColorG)/2),
-								(int) ((currentPoint.getColorB() + oldColorB)/2), (int) 
-								currentPoint.getColorAlpha()));
-						graphics.drawLine(currentX, currentY, currentX, currentY);
-					} else {
-						hasWhiteCount--;
-					}
-					currentY--;
-				}
-				if (currentPoint.getColorAlpha() > 255/biggerSide) {
-					currentPoint.setColorAlpha(currentPoint.getColorAlpha() - (255/(biggerSide)));
-				} else if (currentPoint.getColorAlpha() > 0) {
-					currentPoint.setColorAlpha(0);
-				}
-			}
-			if (hasWhiteCount == 0) {
-				imageHasWhite = false;
-			}
-			rowLength += 2;
-			layerCount++;
-		}
-	graphics.dispose();
-	}
-	
-	private void drawGradientCircles(ArrayList<OriginPointImpl> originPoints) {
+	public void drawGradient(ArrayList<OriginPointImpl> originPoints) {
 		/* in: list of origin points
 		 * out: n/a
 		 * effect: draw gradient circles
@@ -662,10 +406,6 @@ public class ArtGeneratorImpl {
 		// origin points
 		for(int a = 0; a < originPoints.size(); a++) {
 			OriginPointImpl currentPoint = originPoints.get(a);
-			currentPoint.setColorR((int) (Math.random()*256));
-			currentPoint.setColorG((int) (Math.random()*256));
-			currentPoint.setColorB((int) (Math.random()*256));
-			currentPoint.setColorAlpha((currentPoint.getStrength() + 1) * 51);
 			
 			//origin pixel
 			oldColor = new Color(img.getRGB(currentPoint.getX(), currentPoint.getY()));
@@ -697,5 +437,107 @@ public class ArtGeneratorImpl {
 			}
 		}
 	graphics.dispose();	
+	}
+	
+	public void printOriginPoints(ArrayList<OriginPointImpl> originPoints) {
+		for(int i = 0; i < originPoints.size(); i++) {
+			OriginPointImpl currentPoint = originPoints.get(i);
+			System.out.println("Point" + i + ": (x, y): (" + currentPoint.getX() + ", " + 
+			currentPoint.getY() + ") strength: " + currentPoint.getStrength() + "\n    R:" + currentPoint.getColorR() + " G:" + currentPoint.getColorG() + " B:" + currentPoint.getColorB() + " Alpha:" + currentPoint.getColorAlpha());
+		}
+		System.out.print("\n");
+	}
+	
+	// helper methods
+	
+	private ArrayList<OriginPointImpl> selectOriginPoints(int numOfOriginPoints) {
+		/* in: number of origin points to make
+		 * out: list of origin points
+		 * effect: make list of origin points
+		 */
+		
+		ArrayList<OriginPointImpl> originPoints = new ArrayList<OriginPointImpl>();
+		boolean onSector1 = ((int) (Math.random()*2)) == 0;
+		int currentSide;
+		/* sector 1
+		 * 0: bottom right
+		 * 1: right
+		 * 2: top right
+		 * 3: top
+		 * sector 2
+		 * 4: top left
+		 * 5: left
+		 * 6: bottom left
+		 * 7: bottom
+		 */
+		ArrayList<Integer> sector1 = new ArrayList<Integer>();
+		sector1.add(0);
+		sector1.add(1);
+		sector1.add(2);
+		sector1.add(3);
+		ArrayList<Integer> sector2 = new ArrayList<Integer>();
+		sector2.add(4);
+		sector2.add(5);
+		sector2.add(6);
+		sector2.add(7);
+		
+		// Select semi-random points on border
+		for (int i = 0; i < numOfOriginPoints; i++) {
+			if(onSector1) {
+				currentSide = (int) (Math.random() * sector1.size());
+				if (sector1.get(currentSide) == 0) {
+					// bottom right
+					originPoints.add(new OriginPointImpl(img.getWidth() - 1, 
+							img.getHeight() - 1, (int) (Math.random() * 5)));
+				} else if(sector1.get(currentSide) == 1) {
+					// right
+					originPoints.add(new OriginPointImpl(img.getWidth() - 1,
+							(int) ((Math.random()*(img.getHeight()*.40)) + img.getHeight()*.30), (int) (Math.random() * 5)));
+				} else if(sector1.get(currentSide) == 2) {
+					// top right
+					originPoints.add(new OriginPointImpl(img.getWidth() - 1,
+							0, (int) (Math.random() * 5)));
+				} else {
+					// top
+					originPoints.add(new OriginPointImpl((int) ((Math.random()*(img.getWidth()*.40)) + img.getWidth()*.30),
+							0, (int) (Math.random() * 5)));
+				}
+				sector1.remove(currentSide);
+				onSector1 = false;
+			} else {
+				currentSide = (int) (Math.random() * sector2.size());
+				if (sector2.get(currentSide) == 4) {
+					// top left
+					originPoints.add(new OriginPointImpl(0, 
+							0, (int) (Math.random() * 5)));
+				} else if(sector2.get(currentSide) == 5) {
+					// left
+					originPoints.add(new OriginPointImpl(0,
+							(int) ((Math.random()*(img.getHeight()*.40)) + img.getHeight()*.30), (int) (Math.random() * 5)));
+				} else if(sector2.get(currentSide) == 6) {
+					// bottom left
+					originPoints.add(new OriginPointImpl(0,
+							img.getHeight() - 1, (int) (Math.random() * 5)));
+				} else {
+					// bottom
+					originPoints.add(new OriginPointImpl((int) ((Math.random()*(img.getWidth()*.40)) + img.getWidth()*.30),
+							img.getHeight() - 1, (int) (Math.random() * 5)));
+				}
+				sector2.remove(currentSide);
+				onSector1 = true;
+			}
+		}
+		
+		for(int a = 0; a < originPoints.size(); a++) {
+			OriginPointImpl currentPoint = originPoints.get(a);
+			currentPoint.setColorR((int) (Math.random()*256));
+			currentPoint.setColorG((int) (Math.random()*256));
+			currentPoint.setColorB((int) (Math.random()*256));
+			currentPoint.setColorAlpha((currentPoint.getStrength() + 1) * 51);
+		}
+		
+		printOriginPoints(originPoints);
+		
+		return originPoints;
 	}
 }
