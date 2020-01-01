@@ -10,10 +10,14 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 public class ArtGeneratorImpl {
-	BufferedImage img = null;
+	private BufferedImage img = null;
 	
 	public ArtGeneratorImpl(int x, int y) {
 		this.newImage(x, y);
+	}
+	
+	public BufferedImage getImage() {
+		return img;
 	}
 	
 	public void newImage(int x, int y) {
