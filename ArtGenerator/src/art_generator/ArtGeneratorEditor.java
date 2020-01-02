@@ -35,7 +35,6 @@ public class ArtGeneratorEditor {
 		JLabel imgLabel = new JLabel(imgIcon);
 		imgFrame.add(imgLabel);
 		
-		
 		JPanel lButtonFrame = new JPanel();
 		Dimension lButtonFrameDimension = new Dimension(50, 1080);
 		lButtonFrame.setSize(lButtonFrameDimension);
@@ -52,8 +51,8 @@ public class ArtGeneratorEditor {
 		lButtonFrame.add(button4);
 		final JButton button5 = new JButton("Save");
 		lButtonFrame.add(button5);
-		final JButton button11 = new JButton("New Image");
-		lButtonFrame.add(button11);
+//		final JButton button11 = new JButton("New Image");
+//		lButtonFrame.add(button11);
 		button1.addActionListener(new ActionListener() {
 
 			@Override
@@ -94,20 +93,20 @@ public class ArtGeneratorEditor {
 				imgLabel.repaint();
 			}
 		});
-		button11.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				artGenerator.newImage(1920, 1080);
-				imgIcon.setImage(artGenerator.getImage());
-				imgFrameDimension.width = 1080;
-				imgFrameDimension.height = 1920;
-				imgFrame.setSize(imgFrameDimension);
-				imgFrame.setMinimumSize(new Dimension(imgFrameDimension));
-				imgLabel.repaint();
-				imgFrame.repaint();
-			}
-		});
+//		button11.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				artGenerator.newImage(1920, 1080);
+//				imgIcon.setImage(artGenerator.getImage());
+//				imgFrameDimension.width = 1080;
+//				imgFrameDimension.height = 1920;
+//				imgFrame.setSize(imgFrameDimension);
+//				imgFrame.setMinimumSize(new Dimension(imgFrameDimension));
+//				imgLabel.repaint();
+//				imgFrame.repaint();
+//			}
+//		});
 
 		JPanel rButtonFrame = new JPanel();
 		Dimension rButtonFrameDimension = new Dimension(50, 1080);
@@ -125,15 +124,15 @@ public class ArtGeneratorEditor {
 		rButtonFrame.add(button9);
 		final JButton button10 = new JButton("Click Me");
 		rButtonFrame.add(button10);
-		button6.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				artGenerator.drawLightGradient();
-				imgFrame.add(new JLabel(new ImageIcon(artGenerator.getImage())));
-
-			}
-		});
+//		button6.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				artGenerator.drawLightGradient();
+//				imgFrame.add(new JLabel(new ImageIcon(artGenerator.getImage())));
+//
+//			}
+//		});
 		
 		mainFrame.pack();
 		mainFrame.setVisible(true);

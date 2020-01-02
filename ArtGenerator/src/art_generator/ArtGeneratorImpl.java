@@ -84,6 +84,20 @@ public class ArtGeneratorImpl {
 		this.drawGradient(originPoints);
 	}
 	
+	public void drawVividGradient() {
+		/* in: n/a
+		 * return: n/a
+		 * effect: draw random vivid gradient on image
+		 */
+		
+		// select origin points
+		ArrayList<OriginPointImpl> originPoints = this.selectOriginPoints((int) (Math.random() * 5) + 2);
+		
+		// draw gradient boxes
+		this.lightClear();
+		this.drawVividGradientCircles(originPoints);
+	}
+	
 	public void darkClear() {
 		this.pickColorClear(Color.black);
 	}
@@ -406,6 +420,65 @@ public class ArtGeneratorImpl {
 		} else {
 			biggerSide = img.getWidth();
 		}
+		
+		// origin points
+		for(int a = 0; a < originPoints.size(); a++) {
+			OriginPointImpl currentPoint = originPoints.get(a);
+			
+			//origin pixel
+			oldColor = new Color(img.getRGB(currentPoint.getX(), currentPoint.getY()));
+			oldColorR = oldColor.getRed();
+			oldColorG = oldColor.getGreen();
+			oldColorB = oldColor.getBlue();
+			graphics.setColor(new Color((int) ((currentPoint.getColorR() + oldColorR)/2), 
+					(int) ((currentPoint.getColorG() + oldColorG)/2),
+					(int) ((currentPoint.getColorB() + oldColorB)/2), (int) currentPoint.getColorAlpha()));
+			graphics.drawLine(currentPoint.getX(), currentPoint.getY(), currentPoint.getX(), currentPoint.getY());
+			
+			// gradient
+			int newColorAlpha;
+			for (int currentX = 0; currentX < img.getWidth(); currentX++) {
+				for(int currentY = 0; currentY < img.getHeight(); currentY++) {
+					newColorAlpha = (int) (currentPoint.getColorAlpha() - ((currentPoint.getColorAlpha()/(biggerSide)) *
+							Math.sqrt((Math.pow(currentX-currentPoint.getX(), 2) + Math.pow(currentY-currentPoint.getY(), 2)))));
+					if(!(newColorAlpha < 0 || (currentPoint.getX() == currentX && currentPoint.getY() == currentY))) {
+						oldColor = new Color(img.getRGB(currentX, currentY));
+						oldColorR = oldColor.getRed();
+						oldColorG = oldColor.getGreen();
+						oldColorB = oldColor.getBlue();
+						graphics.setColor(new Color((int) ((currentPoint.getColorR() + oldColorR)/2), 
+								(int) ((currentPoint.getColorG() + oldColorG)/2),
+								(int) ((currentPoint.getColorB() + oldColorB)/2), newColorAlpha));
+						graphics.drawLine(currentX, currentY, currentX, currentY);
+					}
+				}
+			}
+		}
+	graphics.dispose();	
+	}
+	
+	public void drawVividGradientCircles(ArrayList<OriginPointImpl> originPoints) {
+		/* in: list of origin points
+		 * out: n/a
+		 * effect: draw vivid gradient circles
+		 */
+		Graphics2D graphics  = img.createGraphics();
+		Color oldColor;
+		int oldColorR;
+		int oldColorG;
+		int oldColorB;
+		
+		int biggerSide;
+		if (img.getHeight() > img.getWidth()) {
+			biggerSide = img.getHeight();
+		} else {
+			biggerSide = img.getWidth();
+		}
+		
+		// fill with first color
+		OriginPointImpl firstPoint = originPoints.get(0);
+		this.pickColorClear(new Color(firstPoint.getColorR(), firstPoint.getColorG(), firstPoint.getColorB(), (int) firstPoint.getColorAlpha()));
+		originPoints.remove(0);
 		
 		// origin points
 		for(int a = 0; a < originPoints.size(); a++) {

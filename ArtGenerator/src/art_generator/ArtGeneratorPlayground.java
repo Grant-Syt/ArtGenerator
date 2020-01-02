@@ -38,5 +38,9 @@ public class ArtGeneratorPlayground {
 		x.darkClear();
 		x.drawGradient(pointList);
 		System.out.println(x.saveCurrentImage("customGradient"));
+		
+		System.out.println("\n" + "vivid gradient:");
+		x.drawVividGradient();
+		System.out.println(x.saveCurrentImage("vividGradient"));
 	}
 }
